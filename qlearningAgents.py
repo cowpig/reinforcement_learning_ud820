@@ -37,10 +37,7 @@ class QLearningAgent(ReinforcementAgent):
 			Should return 0.0 if we never seen
 			a state or (state,action) tuple 
 		"""
-		if state not in self.qvals:
-			return 0.0
-
-		return self.qvals[state][action]
+		return self.qvals.get(state, Counter())[action]
 	
 		
 	def getValue(self, state):
@@ -50,11 +47,11 @@ class QLearningAgent(ReinforcementAgent):
 			there are no legal actions, which is the case at the
 			terminal state, you should return a value of 0.0.
 		"""
-		if state not in self.qvals:
-			return 0.0
+		values = self.qvals.get(state, Counter()).values()
+		if values:
+			return max(values)
+		return 0.0
 
-		return max(self.qvals[sate].values())
-		
 	def getPolicy(self, state):
 		"""
 			Compute the best action to take in a state.  Note that if there
