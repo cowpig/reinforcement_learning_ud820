@@ -28,32 +28,33 @@ class ValueIterationAgent(ValueEstimationAgent):
 		self.iterations = iterations
 		self.values = util.Counter() # A Counter is a dict with default 0
 
-		for state in self.mdp.getStates():
-			if mdp.isTerminal(state):
-				self.values[state] = self.mdp.getReward(state, None, state)
+		# for state in self.mdp.getStates():
+		# 	if mdp.isTerminal(state):
+		# 		import pdb; pdb.set_trace()
+		# 		self.values[state] = self.mdp.getReward(state, None, state)
 		 
 		for i in xrange(iterations):
-			print "\n\nITERATION {}\n".format(i)
+			# print "\n\nITERATION {}\n".format(i)
 			updates = {}
 			for state in self.mdp.getStates():
-				print "--state {}--".format(state)
+				# print "--state {}--".format(state)
 				potential_updates = []
 				for action in self.mdp.getPossibleActions(state):
-					if i == 1 and state == (2,2) and action == ("east"):
-						import pdb; pdb.set_trace()
+					# if i == 1 and state == (2,2) and action == ("east"):
+					# 	import pdb; pdb.set_trace()
 					potential_updates.append(self.getQValue(state, action))
-					print "q-val for action {} is {}".format(action, potential_updates[-1])
+					# print "q-val for action {} is {}".format(action, potential_updates[-1])
 					
 				if potential_updates:
-					print "potential_updates:"
-					print potential_updates
+					# print "potential_updates:"
+					# print potential_updates
 					updates[state] = max(potential_updates)
 
-			print "updates:"
-			print updates
+			# print "updates:"
+			# print updates
 			self.values.update(updates)
-			print "new values:"
-			print self.values
+			# print "new values:"
+			# print self.values
 		
 	def getValue(self, state):
 		"""
@@ -70,13 +71,16 @@ class ValueIterationAgent(ValueEstimationAgent):
 			necessarily create this quantity and you may have
 			to derive it on the fly.
 		"""
-		q = self.values[state]
-		print "\tq-value calc for {}, {}:".format(state, action)
+
+		if action == "exit":
+			return self.mdp.getReward(state, action, "TERMINAL_STATE")
+
+		# q = self.values[state]
+		q = 0
 		for next_state, prob in self.mdp.getTransitionStatesAndProbs(state, action):
-			# reward = self.mdp.getReward(state, action, next_state)
-			reward = self.values[next_state]
-			print "\t\treward from state {} = {}".format(next_state, reward)
-			q += self.discount * prob * reward
+			reward = self.mdp.getReward(state, action, next_state)
+			utility = self.values[next_state]
+			q += self.discount * prob * utility
 
 		return q
 
