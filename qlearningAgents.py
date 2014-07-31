@@ -27,6 +27,7 @@ class QLearningAgent(ReinforcementAgent):
 	"""
 	def __init__(self, **args):
 		"You can initialize Q-values here..."
+		print "I'm a constructor!"
 		ReinforcementAgent.__init__(self, **args)
 		self.qvals = {}
 		
@@ -37,6 +38,7 @@ class QLearningAgent(ReinforcementAgent):
 			Should return 0.0 if we never seen
 			a state or (state,action) tuple 
 		"""
+		# print "getQValue called"
 		return self.qvals.get(state, Counter())[action]
 	
 		
@@ -47,6 +49,7 @@ class QLearningAgent(ReinforcementAgent):
 			there are no legal actions, which is the case at the
 			terminal state, you should return a value of 0.0.
 		"""
+		# print "getValue called"
 		values = self.qvals.get(state, Counter()).values()
 		if values:
 			return max(values)
@@ -58,6 +61,7 @@ class QLearningAgent(ReinforcementAgent):
 			are no legal actions, which is the case at the terminal state,
 			you should return None.
 		"""
+		# print "getPolicy called"
 		legalActions = self.getLegalActions(state)
 
 		if not legalActions:
@@ -82,6 +86,7 @@ class QLearningAgent(ReinforcementAgent):
 			should choose None as the action.
 		"""  
 		# Pick Action
+		# print "getAction called"
 		legalActions = self.getLegalActions(state)
 		
 		if legalActions and util.flipCoin(self.epsilon):
@@ -101,16 +106,18 @@ class QLearningAgent(ReinforcementAgent):
 			NOTE: You should never call this function,
 			it will be called on your behalf
 		"""
-		
 		if not state in self.qvals:
 			self.qvals[state] = Counter()
 		if not nextState in self.qvals:
 			self.qvals[nextState] = Counter()
 
-		old_qval = self.qvals[state][action]
+		old_qval = (1 - self.alpha) * self.qvals[state][action]
 
-		new_qval = (1 - self.alpha) * old_qval
-		new_qval += self.alpha * self.gamma * self.getValue(nextState)
+		new_qval = self.alpha * (reward + self.gamma * self.getValue(nextState))
+
+		# print "(old, new) scaled with alpha of {}: ({}, {})".format(self.alpha, old_qval, new_qval)
+
+		self.qvals[state][action] = new_qval + old_qval
 
 		
 class PacmanQAgent(QLearningAgent):
